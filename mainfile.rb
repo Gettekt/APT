@@ -1,6 +1,7 @@
 require"pry"
 require"json"
 require"open-uri"
+require "table_print"
 
 class Location
 	attr_reader :latitude, :longitude 
@@ -40,13 +41,54 @@ class Search
 	def search
 		@@api_server_key = "&key=AIzaSyD1-K56-s2HMhsROyTaWbKSl2w2Z4fkKe0"
 		@result = (@@url + "location=#{@latitude},#{@longitude}" + @radius + @wanted + @@api_server_key) 
+		#binding.pry
 		@result = open(@result)
 		@result = JSON.load(@result)
 		@file = File.new("json","w+")
 		@file.puts(@result)
 		@file.close
+		@result["results"].each do |place|
+			SearchResult.new(place)
 		end
+		tp SearchResult.all
+	end
 end
+
+class SearchResult
+	@@results = []
+	attr_reader :name, :price, :rating, :address, :open
+	def initialize(place)
+			@name = place["name"]
+			if @name == nil
+				@name  = "Unavailable"
+			end
+			@price = place["price_level"]
+			if @price == nil
+				@price  = "Unavailable"
+			end
+			@rating = place["rating"]
+			if @rating == nil
+				@rating  = "Unavailable"
+			end
+			@address = place["vicinity"]
+			if @address == nil
+				@address  = "Unavailable"
+			end
+			if place["opening_hours"] != nil 
+				@open = place["opening_hours"]["open_now"]
+			end 
+			if @open == nil
+				@open = "Unavailable"
+			end
+			@@results << self
+	end
+	def self.all
+		@@results
+	end
+end
+
+
+
 
 
 
