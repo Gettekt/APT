@@ -1,0 +1,6 @@
+<center><h1>YELP PAGE</h1> 
+<form action="/directions/<%=@address.gsub("\'","$")%>" method="get">
+<button type="submit"><h3>Get Directions</h3></button>
+</form>
+<%a=Yelpdata.new(@name,@address)%>
+<iframe height=750 width=1000 src="<%=a.pass%>">

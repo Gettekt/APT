@@ -1,0 +1,56 @@
+<center><h1>RESULTS</h1></center>
+<table>
+	<tr>
+		<th>
+			ID
+		</th>
+		<th>
+			<form action = '/info/name' method = 'get'>
+			<button type="submit">Name</button>
+			</form>
+		</th>
+		<th>
+			<form action = '/info/price' method = 'get'>
+			<button type="submit">Price</button>
+			</form>
+		</th>
+		<th>
+			<form action = '/info/rating' method = 'get'>
+			<button type="submit">Rating</button>
+			</form>
+		</th>
+		<th>
+			Address
+		</th>
+		<th>
+			<form action = '/info/open' method = 'get'>
+			<button type="submit">Open</button>
+			</form>
+		</th>
+	</tr>
+	<%@results.each do |result|%>
+		<tr>
+			<td>
+				<form action = '/yelp/:<%=result.name.gsub("\'","$")%>+<%=result.address.gsub("\'","$")%>' method = 'get'>
+				<button type="submit"><%=result.num%></button>
+				</form>
+			</td>
+			<td>
+				<%=result.name%>
+			</td>
+			<td>
+				<%=result.price%>
+			</td>
+			<td>
+				<%=result.rating%> 
+			</td>
+			<td>
+				<%=result.address%>
+			</td>
+			<td>
+				<%=result.open%>
+			</td>
+		</tr>
+	<%end%>
+</table>
+

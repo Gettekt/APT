@@ -1,7 +1,9 @@
 require"pry"
 require"json"
 require"open-uri"
-require "table_print"
+require"table_print"
+require"nokogiri"
+require"mechanize"
 
 class Location
 	attr_reader :latitude, :longitude 
@@ -38,7 +40,6 @@ class Search
 	def search
 		@@api_server_key = "&key=AIzaSyD1-K56-s2HMhsROyTaWbKSl2w2Z4fkKe0"
 		@result = (@@url + "location=#{@latitude},#{@longitude}" + @radius + @wanted + @@api_server_key) 
-		#binding.pry
 		@result = open(@result)
 		@result = JSON.load(@result)
 		@file = File.new("json","w+")
@@ -51,6 +52,7 @@ class Search
 		SearchResult.sort
 	end
 end
+
 class SearchResult
 	@@results = []
 	attr_reader :num, :name, :price, :rating, :address, :open
@@ -94,7 +96,6 @@ class SearchResult
 			@@results.sort_by! do |result|
 				result.price.to_f
 			end
-			@@results.reverse!
 			@@results.each_with_index do |result,index|
 				result.num=(index+1)
 			end
@@ -117,7 +118,17 @@ class SearchResult
 				result.num=(index+1)
 			end
 		elsif how_to_sort == "4" or how_to_sort.downcase == "done sorting"
-		puts "In progress..."
+			puts "Would you like to pull up Yelp results?\n1.Yes\n2.No"
+			@yelp = gets.chomp
+			if @yelp == "1" || @yelp.downcase == "yes" || @yelp.downcase == "y"
+				puts "Select number of result"
+				@res_number= gets.chomp
+				@res = @@results[@res_number.to_i-1]
+				Yelpdata.new(@res)
+			elsif @yelp == "2" || @yelp.downcase == "no" || @yelp.downcase == "n"
+			#
+			#
+			end
 		end
 		unless how_to_sort == "4" or how_to_sort.downcase == "done sorting"
 			tp SearchResult.all
@@ -125,6 +136,34 @@ class SearchResult
 		end
 	end
 end
+class Yelpdata
+	def initialize(res_instance)
+		@@url ="http://www.yelp.com/search?find_desc="
+		@name = res_instance.name
+		@address = res_instance.address
+		@url = @@url + @name.gsub(" ","+").gsub("&","%20") + "&find_loc=" + @address.gsub(" ","+") + "&ns=1"
+		agent = Mechanize.new
+		page = agent.get(@url)
+		a = page.search("li.regular-search-result")
+		a.each do |result|
+			b = result.search("div.secondary-attributes address")
+			if b.text.delete("\n").strip.scan(/^\d+/) == @address.scan(/^\d+/)
+		 		c = result.search("a.biz-name")
+		 		c = "http://yelp.com" + c.attribute("href").value
+		 		system("open",  c)
+			end
+		end
+	end
+end
+
+	
+	
+
+
+
+
+
+
 bob = Location.new
 bob.cord_finder
 charles = Search.new(bob)

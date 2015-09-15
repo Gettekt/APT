@@ -1,0 +1,12 @@
+source 'http://rubygems.org'
+
+gem 'pry'
+gem 'json'
+gem 'nokogiri'
+gem 'mechanize'
+gem 'shotgun'
+gem 'require_all'
+gem 'pg'
+gem 'rake'
+gem 'sinatra'
+require 'open-uri'
